@@ -1,8 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter , UploadFile
 from fastapi.responses import JSONResponse
 
-router = APIRouter(prefix="", tags=["chat"])
+from src.service.processFile import chunk_file
 
-@router.post('/chat')
-def chat(message: str):
-    return JSONResponse(content={"Your message": message}, status_code=200)
+router = APIRouter(prefix="/api", tags=["chat"])
+
+@router.post('/upload')
+def upload_file(file : UploadFile):
+    return  chunk_file(file, 1024)
