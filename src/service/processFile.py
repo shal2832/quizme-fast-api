@@ -1,8 +1,8 @@
-from fastapi import FastAPI 
+from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-app = FastAPI()  
+router = APIRouter(prefix="", tags=["chat"])
 
-@app.post('/chat')
+@router.post('/chat')
 def chat(message: str):
     return JSONResponse(content={"Your message": message}, status_code=200)
