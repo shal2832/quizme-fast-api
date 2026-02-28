@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.service.processFile import router as chat_router
+from src.controller.uploadFile import router as chat_router
 
 app = FastAPI()
 
