@@ -1,5 +1,10 @@
+import os
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from src.controller.uploadFile import router as chat_router
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = FastAPI()
 
