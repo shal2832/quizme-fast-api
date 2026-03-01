@@ -114,3 +114,5 @@ quizme-fast-api/
    ```bash
    uv sync --reinstall
    ```
+
+Ref: https://api.qdrant.tech/api-reference
