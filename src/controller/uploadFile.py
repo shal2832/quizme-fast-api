@@ -17,3 +17,4 @@ async def upload_file(file : UploadFile):
 def query_llm(prompt: str):
     res =  llm_invoke(prompt)
     return JSONResponse(content={"message": res}, status_code=200)
+
