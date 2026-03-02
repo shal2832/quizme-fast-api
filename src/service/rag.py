@@ -12,8 +12,8 @@ class Rag:
         """Initialize RAG pipeline with Qdrant vector store"""
         self.collectionName = collection_name
         self.qdrantClient = QdrantClient(
-            url=os.getenv("qdrant_cluster_url"),
-            api_key=os.getenv("qdrant_api_key")
+            url=os.getenv("QDRANT_CLUSTER_URL"),
+            api_key=os.getenv("QDRANT_API_KEY")
         )
         self.textSplitter = RecursiveCharacterTextSplitter(
             chunk_size=1000,
