@@ -1,0 +1,21 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Vercel Action
+        uses: amondnet/vercel-action@v3
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          # The `vercel-args` can be used to pass environment variables if not set in Vercel UI
+          # Example for passing an environment variable:
+          # vercel-args: '--prod --env DATABASE_URL=${{ secrets.DATABASE_URL }}'
