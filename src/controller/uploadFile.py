@@ -95,28 +95,10 @@ async def generate_questions_from_all(request: MCQAllRequest):
         )
 
 
-@router.post("/questions/query/cleanup")
-async def generate_questions_and_cleanup(request: MCQRequest):
-    """
-    Generate MCQs based on a query and automatically delete the collection after generation.
-    This is a convenience endpoint for when you want to use the collection once and then clean up.
-    """
-    try:
-        generator = MCQGenerator()
-        result = generator.generate_and_cleanup(
-            query=request.query,
-            num_questions=request.num_questions,
-            top_k=request.top_k
-        )
-        return JSONResponse(content=result, status_code=200)
-    except Exception as e:
-        return JSONResponse(
-            content={"error": str(e), "message": "Failed to generate questions and cleanup"},
-            status_code=500
-        )
 
 
-@router.get("/questions/status")
+
+@router.get("/collection/status")
 async def check_collection_status():
     """Check the status of the Qdrant collection"""
     try:

@@ -158,6 +158,10 @@ Always format your response as valid JSON with the structure specified. The ques
         print(f"Generating {num_questions} MCQs from retrieved content...")
         questions = self.generate_mcq_from_content(context, num_questions=num_questions)
         
+         # Delete collection
+        print("\nCleaning up Qdrant collection...")
+        self.cleanup_collection()
+       
         return {
             "query": query,
             "num_documents_retrieved": len(documents),
@@ -212,7 +216,7 @@ Always format your response as valid JSON with the structure specified. The ques
         print(f"\n{'='*60}")
         print(f"Total MCQs Generated: {len(all_questions)}")
         print(f"{'='*60}\n")
-        
+        self.cleanup_collection()
         return all_questions
     
     def create_rag_chain(self):
@@ -276,54 +280,6 @@ Answer:"""
             True if deletion was successful, False otherwise
         """
         return self.rag.delete_collection()
-    
-    def generate_and_cleanup(self, query: str, num_questions: int = 5, top_k: int = 5) -> Dict[str, Any]:
-        """
-        Complete workflow: Generate MCQs from query and then delete the collection.
-        
-        Args:
-            query: Search query for retrieving relevant documents
-            num_questions: Number of MCQs to generate
-            top_k: Number of documents to retrieve for context
-            
-        Returns:
-            Dictionary containing generated questions and cleanup status
-        """
-        print(f"\n{'='*60}")
-        print(f"MCQ Generation with Auto-Cleanup")
-        print(f"{'='*60}")
-        
-        # Generate MCQs
-        result = self.generate_mcq_from_query(
-            query=query,
-            num_questions=num_questions,
-            top_k=top_k
-        )
-        
-        # Delete collection
-        print("\nCleaning up Qdrant collection...")
-        cleanup_success = self.cleanup_collection()
-        
-        result['cleanup_status'] = 'success' if cleanup_success else 'failed'
-        
-        return result
 
 
-# Example usage function
-def example_usage():
-    """Example of how to use the MCQGenerator"""
-    
-    # Initialize the generator
-    generator = MCQGenerator()
-    
-    # Option 1: Generate MCQs from a specific query
-    result = generator.generate_mcq_from_query(
-        query="What are the key concepts of machine learning?",
-        num_questions=5,
-        top_k=5
-    )
-    print(json.dumps(result, indent=2))
-    
-    # Option 2: Generate MCQs from all documents
-    all_questions = generator.generate_mcq_from_all_content(num_questions=10)
-    print(json.dumps(all_questions, indent=2))
+
