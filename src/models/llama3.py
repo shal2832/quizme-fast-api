@@ -2,7 +2,7 @@ import os
 from langchain_huggingface import HuggingFaceEndpoint
 from langchain_huggingface import ChatHuggingFace
 from langchain_core.messages import SystemMessage, HumanMessage
-from src.service.rag import Rag
+from src.service.qdrantService import qdrant_service_instance
 
 def get_llm():
     """Initialize and return the LLM instance"""
@@ -24,7 +24,7 @@ def get_llm():
 
 def llm_invoke(query: str) -> str:
     """Invoke the LLM with a prompt"""
-    context = Rag().context_retrieval(query)
+    context = qdrant_service_instance.query_context_retrieval(query)
     print(f"Context retrieved for query '{query}': {context}")
 
     system_prompt = f"""
