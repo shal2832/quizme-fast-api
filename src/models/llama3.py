@@ -20,27 +20,33 @@ def get_llm():
         print(f"Error initializing LLM: {e}")
         raise
 
-
-
-def llm_invoke(query: str) -> str:
-    """Invoke the LLM with a prompt"""
-    context = qdrant_service_instance.query_context_retrieval(query)
-    print(f"Context retrieved for query '{query}': {context}")
-
-    system_prompt = f"""
-    You are a questioner, based on the retreived context, 
-    prepare mutiple choice questions and interact with the user on the follow ups.
-
-    Always be in context, and be conversational with the user.
-    Use the provided context to answer the user's query. If the context does not contain the answer, respond with "I don't know".
-    Context: {context}
+def llm_invoke(query: str, prompt: str, invoked_by_mcqApi = False) -> str:
     """
+    Invoke LLM based on user query and get reponse
+
+    Args: 
+        query: input by user,
+        prompt: system_prompt for model behavior,
+        invoked_by_mcqApi: boolean value to determine respective context retrieval methods
+
+    Returns:
+        Response content from llm
+    """
+    if(invoked_by_mcqApi):
+        context = qdrant_service_instance.entire_context_retrieval()
+        print("Entire context retrived for mcq generation")
+    else:
+        context = qdrant_service_instance.query_context_retrieval(query)
+        print("Context retrieved based on user query")
+
+    system_prompt = prompt.replace("{context}", context)
     try:
-        print(f"Invoking LLM with prompt: {query}")
+        print(f"Invoking LLM with prompt: {system_prompt}")
         chat = ChatHuggingFace(llm=get_llm())
-        resp = chat.invoke([SystemMessage(content=system_prompt),
-                    HumanMessage(content=query)])   
-        return str(resp.content).strip() if resp else ""
+        response = chat.invoke([SystemMessage(content=system_prompt),
+                    HumanMessage(content=query)])  
+        print(f"LLM response for query '{query}': {response.content}") 
+        return str(response.content).strip() if response else ""
     except Exception as e:
         print(f"Error invoking LLM: {e}")
         raise

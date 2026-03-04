@@ -24,12 +24,19 @@ class qdrantService:
         self.hf_embeddings = HuggingFaceEmbeddings(
             model_name="sentence-transformers/all-MiniLM-L6-v2"
         )
+        self.check_collection_exists()
         self.vector_store = QdrantVectorStore(
             client=self.qdrantClient,
             collection_name=self.collectionName,
             embedding=self.hf_embeddings
         )
-        self.check_collection_exists()
+        # This tells Qdrant to build a "Keyword" index for your file_id field
+        self.qdrantClient.create_payload_index(
+            collection_name=self.collectionName,
+            field_name="metadata.file_id",
+            field_schema=rest.PayloadSchemaType.KEYWORD,
+        )
+        
 
     def set_file_name(self, file_name):
         """
@@ -110,7 +117,6 @@ class qdrantService:
             )
             print(f"Vector store initialized with collection '{self.collectionName}' for context retrieval.")
             relevant_chunks = self.vector_store.similarity_search(query, k=5)
-            print(f"Relevant chunks retrieved for query '{query}': {[chunk.page_content for chunk in relevant_chunks]}")
             return ".\n".join([chunk.page_content for chunk in relevant_chunks])
         except Exception as e:
             print(f"Error: {e}, Provided collection not present to fetch the context for the query.")
@@ -131,15 +137,17 @@ class qdrantService:
             )
             print(f"Vector store initialized with collection '{self.collectionName}' for entire context retrieval.")
             all_chunks = self.vector_store.similarity_search(
-                "", 
-                k=1000,
-                filter = rest.Filter(
-                    must= rest.FieldCondition(
-                        key="metadata.file_id",
-                        match=rest.MatchValue(value=self.file_name)
-                    )
-                ))  # Retrieve all chunks
-            print(f"All chunks retrieved for entire context retrieval: {[chunk.page_content for chunk in all_chunks]}")
+                            query="", 
+                            k=1000,
+                            filter=rest.Filter(
+                                must=[
+                                    rest.FieldCondition(
+                                        key="metadata.file_id", # Must use the 'metadata.' prefix
+                                        match=rest.MatchValue(value="test.pdf")
+                                    )
+                                ]
+                            )
+                        )  # Retrieve all chunks
             return ".\n".join([chunk.page_content for chunk in all_chunks])
         except Exception as e:
             print(f"Error: {e}, Provided collection not present to fetch the entire context.")
