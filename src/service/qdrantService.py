@@ -2,6 +2,7 @@ import os
 from langchain_qdrant import QdrantVectorStore
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from qdrant_client import QdrantClient, models
+from qdrant_client.http import models as rest
 from langchain_huggingface import HuggingFaceEmbeddings
 from fastapi import HTTPException
 
@@ -129,7 +130,15 @@ class qdrantService:
                 api_key= os.getenv("qdrant_api_key")
             )
             print(f"Vector store initialized with collection '{self.collectionName}' for entire context retrieval.")
-            all_chunks = self.vector_store.similarity_search("", k=1000)  # Retrieve all chunks
+            all_chunks = self.vector_store.similarity_search(
+                "", 
+                k=1000,
+                filter = rest.Filter(
+                    must= rest.FieldCondition(
+                        key="metadata.file_id",
+                        match=rest.MatchValue(value=self.file_name)
+                    )
+                ))  # Retrieve all chunks
             print(f"All chunks retrieved for entire context retrieval: {[chunk.page_content for chunk in all_chunks]}")
             return ".\n".join([chunk.page_content for chunk in all_chunks])
         except Exception as e:
