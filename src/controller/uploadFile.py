@@ -17,10 +17,10 @@ async def upload_file(file : UploadFile):
         JSONResponse: A response containing a success message, the file name, and the number of chunks created from the file.
     """
     data = await file.read() 
-    temp_file_path, serializable_chunks = chunk_file(data)
+    temp_file_path, serializable_chunks = chunk_file(data, file.filename)
     #delete the temp file after processing
     os.remove(temp_file_path)
-    return JSONResponse(content={"message": "File processed successfully", "file" : temp_file_path, "number of chunks": len(serializable_chunks)}, status_code=200)
+    return JSONResponse(content={"message": "File processed successfully", "file" : temp_file_path, "number of chunks": serializable_chunks}, status_code=200)
 
 @router.post('/query')
 def query_llm(prompt: str):

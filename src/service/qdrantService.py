@@ -9,8 +9,9 @@ from fastapi import HTTPException
 class qdrantService:
 
     collectionName = 'pdf_chunks'
-
+    
     def __init__(self):
+        self.file_name = None
         self.qdrantClient = QdrantClient(
             url= os.getenv("qdrant_cluster_url"),
             api_key= os.getenv("qdrant_api_key")
@@ -28,6 +29,16 @@ class qdrantService:
             embedding=self.hf_embeddings
         )
         self.check_collection_exists()
+
+    def set_file_name(self, file_name):
+        """
+        Get the file name from user input and set it to class variable file_name for all context retreival"
+
+        Args:
+            file_name: name of the file uploaded by the user
+        """
+        self.file_name = file_name
+        print(f"File name set to: {self.file_name} for context retrieval.")
 
     def check_collection_exists(self):
         """
