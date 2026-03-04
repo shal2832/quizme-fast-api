@@ -137,13 +137,3 @@ class qdrantService:
 
 # Create the instance here
 qdrant_service_instance = qdrantService()
-
-    
-
-
-
-
-
-    
-
-    
