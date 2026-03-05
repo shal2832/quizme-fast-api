@@ -9,6 +9,7 @@ def chunk_file(content, filename):
 
     loader = PyMuPDFLoader(temp_file_path)
     documents = loader.load()
+    qdrant_service_instance.check_collection_exists()
     docs = qdrant_service_instance.textSplitter.create_documents([doc.page_content for doc in documents])
     for doc in docs:
         doc.metadata["file_id"] = filename
