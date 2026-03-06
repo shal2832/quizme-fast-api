@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4 # Checks out your repository
       - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v3 # Uses a specific GitHub Action for Vercel deployment
+        uses: amondnet/vercel-action@v20 # Uses a specific GitHub Action for Vercel deployment
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
