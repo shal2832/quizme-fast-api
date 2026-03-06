@@ -14,8 +14,8 @@ class qdrantService:
     def __init__(self):
         self.file_name = None
         self.qdrantClient = QdrantClient(
-            url= os.getenv("qdrant_cluster_url"),
-            api_key= os.getenv("qdrant_api_key")
+            url= os.getenv("QDRANT_CLUSTER_URL"),
+            api_key= os.getenv("QDRANT_API_KEY")
         )
         self.textSplitter = RecursiveCharacterTextSplitter(
             chunk_size= 1000,
@@ -31,11 +31,15 @@ class qdrantService:
             embedding=self.hf_embeddings
         )
         # This tells Qdrant to build a "Keyword" index for your file_id field
-        self.qdrantClient.create_payload_index(
-            collection_name=self.collectionName,
-            field_name="metadata.file_id",
-            field_schema=rest.PayloadSchemaType.KEYWORD,
-        )
+        try:
+            self.qdrantClient.create_payload_index(
+                collection_name=self.collectionName,
+                field_name="metadata.file_id",
+                field_schema=rest.PayloadSchemaType.KEYWORD,
+            )
+            print(f"Payload index created for metadata.file_id")
+        except Exception as e:
+            print(f"Note: Payload index creation skipped or failed (may already exist): {e}")
         
 
     def set_file_name(self, file_name):
@@ -77,7 +81,7 @@ class qdrantService:
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
     
-    async def delete_collection(self, collection_name):
+    def delete_collection(self, collection_name):
         """
         Delete a collection in Qdrant with the specified name.
         
@@ -112,14 +116,15 @@ class qdrantService:
             self.vector_store.from_existing_collection(
                 embedding=self.hf_embeddings,
                 collection_name=self.collectionName,
-                url=os.getenv("qdrant_cluster_url"),
-                api_key= os.getenv("qdrant_api_key")
+                url=os.getenv("QDRANT_CLUSTER_URL"),
+                api_key= os.getenv("QDRANT_API_KEY")
             )
             print(f"Vector store initialized with collection '{self.collectionName}' for context retrieval.")
             relevant_chunks = self.vector_store.similarity_search(query, k=5)
             return ".\n".join([chunk.page_content for chunk in relevant_chunks])
         except Exception as e:
             print(f"Error: {e}, Provided collection not present to fetch the context for the query.")
+            return ""
     
     def entire_context_retrieval(self):
         """
@@ -129,28 +134,25 @@ class qdrantService:
             str: The concatenated context retrieved from the Qdrant collection.
         """
         try:
-            self.vector_store.from_existing_collection(
-                embedding=self.hf_embeddings,
+            print(f"Retrieving all documents from collection '{self.collectionName}'.")
+            # Use scroll to retrieve all documents from the collection
+            all_points, _ = self.qdrantClient.scroll(
                 collection_name=self.collectionName,
-                url=os.getenv("qdrant_cluster_url"),
-                api_key= os.getenv("qdrant_api_key")
+                limit=1000  # Adjust limit if you have more documents
             )
-            print(f"Vector store initialized with collection '{self.collectionName}' for entire context retrieval.")
-            all_chunks = self.vector_store.similarity_search(
-                            query="", 
-                            k=1000,
-                            filter=rest.Filter(
-                                must=[
-                                    rest.FieldCondition(
-                                        key="metadata.file_id", # Must use the 'metadata.' prefix
-                                        match=rest.MatchValue(value="test.pdf")
-                                    )
-                                ]
-                            )
-                        )  # Retrieve all chunks
-            return ".\n".join([chunk.page_content for chunk in all_chunks])
+            
+            # Extract page content from all points
+            all_content = []
+            for point in all_points:
+                if point.payload and 'page_content' in point.payload:
+                    all_content.append(point.payload['page_content'])
+            
+            context = ".\n".join(all_content)
+            print(f"Retrieved {len(all_content)} documents from collection.")
+            return context
         except Exception as e:
-            print(f"Error: {e}, Provided collection not present to fetch the entire context.")
+            print(f"Error: {e}, Failed to fetch entire context.")
+            return ""
 
 # Create the instance here
 qdrant_service_instance = qdrantService()
