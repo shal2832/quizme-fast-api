@@ -1,10 +1,16 @@
 from fastapi import APIRouter , UploadFile
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 from src.models.llama3 import llm_invoke
 from src.service.processFile import chunk_file
 from src.service.prepareMCQ import mcq_generator
 from src.service.qdrantService import qdrant_service_instance
 import os
+
+class MCQRequest(BaseModel):
+    num_of_questions: int = 5
+    query: str = ""
+
 router = APIRouter(prefix="/api", tags=["chat"])
 
 @router.post('/upload')
@@ -45,7 +51,7 @@ def chat_with_llm(prompt: str):
     return JSONResponse(content={"message": res}, status_code=200)
 
 @router.post('/generate-mcq/context')
-def generate_mcq(num_of_questions : int = 5, query: str = ""):
+def generate_mcq(request: MCQRequest):
     """
     Endpoint to generate multiple choice questions (MCQs) based on available context. It uses the LLM to create educational and relevant MCQs.
     
@@ -56,12 +62,12 @@ def generate_mcq(num_of_questions : int = 5, query: str = ""):
         JSONResponse: A response containing the generated MCQs in JSON format.
     """
   
-    mcq_json = mcq_generator.generate_mcq_with_context(num_of_questions,query )
+    mcq_json = mcq_generator.generate_mcq_with_context(request.num_of_questions, request.query)
     return JSONResponse(content={"message" : mcq_json}, status_code=200)
 
 
 @router.post('/generate-mcq/all')
-def generate_mcq(num_of_questions : int = 5):
+def generate_mcq(request: MCQRequest):
     """
     Endpoint to generate multiple choice questions (MCQs) based on all documents. It uses the LLM to create educational and relevant MCQs.
     
@@ -72,7 +78,7 @@ def generate_mcq(num_of_questions : int = 5):
         JSONResponse: A response containing the generated MCQs in JSON format.
     """
   
-    mcq_json = mcq_generator.generate_mcq_with_context(num_of_questions)
+    mcq_json = mcq_generator.generate_mcq_with_context(request.num_of_questions, request.query)
     return JSONResponse(content={"message" : mcq_json}, status_code=200)
 
 
