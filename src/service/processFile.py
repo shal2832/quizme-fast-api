@@ -2,7 +2,7 @@ from langchain_community.document_loaders import PyMuPDFLoader
 from src.service.qdrantApiService import qdrantApiServiceInstance
 
 def chunk_file(content, filename):
-    temp_file_path = f"temp_{filename}"
+    temp_file_path = f"/tmp/temp_{filename}"
     with open(temp_file_path, "wb") as f:
         f.write(content)
     print(f"File read successfully")
