@@ -12,5 +12,6 @@ dependencies = [
     "langchain-huggingface>=1.2.0",
     "pymupdf>=1.27.1",
     "python-dotenv>=1.2.1",
-    "quizme-qdrant-service @git+https://github.com/shal2832/quizme-qdrant-service.git"
+    "quizme-qdrant-service @git+https://github.com/shal2832/quizme-qdrant-service.git",
+    "sentence-transformers>=5.2.3",
 ]
