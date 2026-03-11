@@ -8,8 +8,9 @@ dependencies = [
     "fastapi[standard]>=0.134.0",
     "langchain>=1.2.10",
     "langchain-community>=0.4.1",
+    "langchain-qdrant>=1.1.0",
     "langchain-huggingface>=1.2.0",
     "pymupdf>=1.27.1",
     "python-dotenv>=1.2.1",
-    "qdrant-shared-service @git+https://github.com/shal2832/quizme-qdrant-service.git"
+    "quizme-qdrant-service @git+https://github.com/shal2832/quizme-qdrant-service.git"
 ]
