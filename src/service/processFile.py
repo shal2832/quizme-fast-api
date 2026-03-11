@@ -1,5 +1,5 @@
 from langchain_community.document_loaders import PyMuPDFLoader
-from qdrantService import qdrant_service_instance
+from src.service.qdrantApiService import qdrantApiServiceInstance
 
 def chunk_file(content, filename):
     temp_file_path = f"temp_{filename}"
@@ -9,13 +9,16 @@ def chunk_file(content, filename):
 
     loader = PyMuPDFLoader(temp_file_path)
     documents = loader.load()
-    docs = qdrant_service_instance.textSplitter.create_documents([doc.page_content for doc in documents])
-    for doc in docs:
+    document_content = []
+    for doc in documents:
         doc.metadata["file_id"] = filename
+        document_content.append({"page_content": doc.page_content, "metadata": doc.metadata})
+    docs = qdrantApiServiceInstance.split_documents_api(document_content)
     # for passing in api response only
-    serializable_chunks = [{"page_content": doc.page_content, "metadata": doc.metadata} for doc in docs]
+    serializable_chunks = [{"page_content": doc.page_content, "metadata": doc.metadata} for doc in docs.json().get("documents", [])
+    ]
 
     #pass the file name inside qdrant service, so that it can be used when retrieving context
-    qdrant_service_instance.set_file_name(filename)
-    qdrant_service_instance.vector_store.add_documents(docs)
+    ### qdrant_service_instance.set_file_name(filename)
+    qdrantApiServiceInstance.add_documents_api(docs)
     return temp_file_path, serializable_chunks
