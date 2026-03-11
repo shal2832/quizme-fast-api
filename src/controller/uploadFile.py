@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from src.models.llama3 import llm_invoke
 from src.service.processFile import chunk_file
 from src.service.prepareMCQ import mcq_generator
-from src.service.qdrantService import qdrant_service_instance
+from qdrantService import qdrant_service_instance
 import os
 router = APIRouter(prefix="/api", tags=["chat"])
 

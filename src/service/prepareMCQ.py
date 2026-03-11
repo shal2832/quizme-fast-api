@@ -1,7 +1,7 @@
 import json
 import re
 from src.models.llama3 import llm_invoke
-from src.service.qdrantService import qdrant_service_instance
+from qdrantService import qdrant_service_instance
 class MCQGenerator:
     """
     RAG-based MCQ Generator that retrieves content from Qdrant

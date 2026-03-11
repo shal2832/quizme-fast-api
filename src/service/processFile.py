@@ -1,5 +1,5 @@
 from langchain_community.document_loaders import PyMuPDFLoader
-from src.service.qdrantService import qdrant_service_instance
+from qdrantService import qdrant_service_instance
 
 def chunk_file(content, filename):
     temp_file_path = f"temp_{filename}"

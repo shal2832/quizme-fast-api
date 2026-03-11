@@ -2,7 +2,7 @@ import os
 from langchain_huggingface import HuggingFaceEndpoint
 from langchain_huggingface import ChatHuggingFace
 from langchain_core.messages import SystemMessage, HumanMessage
-from src.service.qdrantService import qdrant_service_instance
+from qdrantService import qdrant_service_instance
 
 def get_llm():
     """Initialize and return the LLM instance"""
