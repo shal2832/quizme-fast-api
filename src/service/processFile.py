@@ -1,8 +1,13 @@
+import os
+import random
 from langchain_community.document_loaders import PyMuPDFLoader
 from src.service.qdrantApiService import qdrantApiServiceInstance
-import random
+
 def chunk_file(content, filename):
-    temp_file_path = f"/tmp/temp_{random.randint(1, 1000)}_{filename}"
+    clean_name = os.path.basename(filename)
+    temp_file_path = f"/tmp/temp_{random.randint(1, 1000)}_{clean_name}"
+    print(f"WRITING TO: {temp_file_path}") 
+
     with open(temp_file_path, "wb") as f:
         f.write(content)
     print(f"File read successfully")
