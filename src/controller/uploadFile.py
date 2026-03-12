@@ -3,8 +3,9 @@ from fastapi.responses import JSONResponse
 from src.models.llama3 import llm_invoke
 from src.service.processFile import chunk_file
 from src.service.prepareMCQ import mcq_generator
-from src.service.qdrantService import qdrant_service_instance
+from src.service.qdrantApiService import qdrantApiServiceInstance
 import os
+
 router = APIRouter(prefix="/api", tags=["chat"])
 
 @router.post('/upload')
@@ -19,10 +20,10 @@ async def upload_file(file : UploadFile):
         JSONResponse: A response containing a success message, the file name, and the number of chunks created from the file.
     """
     data = await file.read() 
-    temp_file_path, serializable_chunks = chunk_file(data, file.filename)
+    temp_file_path = chunk_file(data, file.filename)
     #delete the temp file after processing
     os.remove(temp_file_path)
-    return JSONResponse(content={"message": "File processed successfully", "file" : temp_file_path, "number of chunks": serializable_chunks}, status_code=200)
+    return JSONResponse(content={"message": "File processed successfully", "file" : temp_file_path}, status_code=200)
 
 @router.post('/query')
 def chat_with_llm(prompt: str):
@@ -78,9 +79,10 @@ def generate_mcq(num_of_questions : int = 5):
 
 
 @router.delete('/collection/delete')
-def delete_collection():
+def delete_collection(collection_name):
     """
     Endpoint to delete the existing collection in Qdrant. This can be used to clear all stored data and start fresh.
     """
-    qdrant_service_instance.delete_collection(qdrant_service_instance.collectionName)
-    return JSONResponse(content={"message" : "Collection deleted successfully"}, status_code=200)
+    response = qdrantApiServiceInstance.delete_api(collection_name)
+    return JSONResponse(content={"message" : "Collection deleted successfully"}, status_code=response.status_code)
+

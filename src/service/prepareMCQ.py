@@ -1,7 +1,7 @@
 import json
 import re
 from src.models.llama3 import llm_invoke
-from src.service.qdrantService import qdrant_service_instance
+from src.service.qdrantApiService import qdrantApiServiceInstance
 class MCQGenerator:
     """
     RAG-based MCQ Generator that retrieves content from Qdrant
@@ -49,11 +49,16 @@ class MCQGenerator:
         
         context = ""
         if(query):
-            print(f"[MCQ Generation] Retrieving context based on query: {query}")
-            context = qdrant_service_instance.query_context_retrieval(query)
+            context_response = qdrantApiServiceInstance.query_api(query)
+            print(f"[MCQ Generation] Query API response received with status code: {context_response.status_code}")
+            context = context_response.json().get("context", "")
+            print(f"[MCQ Generation] Context retrieved based on user query with length: {len(context)} characters")
         else:
-            print(f"[MCQ Generation] Retrieving entire context from collection")
-            context = qdrant_service_instance.entire_context_retrieval()
+            context_response = qdrantApiServiceInstance.entire_context_api()
+            print(f"[MCQ Generation] Entire context API response received with status code: {context_response.status_code}")
+            context = context_response.json().get("context", "")
+            print(f"[MCQ Generation] Context retrieved based on user query with length: {len(context)} characters")
+
         
         print(f"[MCQ Generation] Context retrieved with length: {len(context)} characters")
         
@@ -67,8 +72,10 @@ class MCQGenerator:
         res = llm_invoke(user_prompt, system_prompt, True)
         print(f"[MCQ Generation] LLM response received with length: {len(res)} characters")
         
-        print(f"[MCQ Generation] Deleting collection: {qdrant_service_instance.collectionName}")
-        qdrant_service_instance.delete_collection(qdrant_service_instance.collectionName)
+        collections_response_json = qdrantApiServiceInstance.list_collections_api()
+        collections_response = collections_response_json.json().get("collections", [])
+        print(f"[MCQ Generation] Deleting collection:{collections_response}")
+        qdrantApiServiceInstance.delete_api(collections_response_json.json().get("collections", [])[0] if collections_response_json.json().get("collections", []) else "")
         
         print(f"[MCQ Generation] Formatting MCQ response...")
         formatted_response = self.format_mcq_response(res)
