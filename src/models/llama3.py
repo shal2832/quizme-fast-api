@@ -2,7 +2,7 @@ import os
 from langchain_huggingface import HuggingFaceEndpoint
 from langchain_huggingface import ChatHuggingFace
 from langchain_core.messages import SystemMessage, HumanMessage
-from src.service.qdrantService import qdrant_service_instance
+from src.service.qdrantApiService import qdrantApiServiceInstance
 
 def get_llm():
     """Initialize and return the LLM instance"""
@@ -19,7 +19,6 @@ def get_llm():
     except Exception as e:
         print(f"Error initializing LLM: {e}")
         raise
-
 def llm_invoke(query: str, prompt: str, invoked_by_mcqApi = False) -> str:
     """
     Invoke LLM based on user query and get reponse
@@ -33,10 +32,12 @@ def llm_invoke(query: str, prompt: str, invoked_by_mcqApi = False) -> str:
         Response content from llm
     """
     if(invoked_by_mcqApi):
-        context = qdrant_service_instance.entire_context_retrieval()
+        context_response = qdrantApiServiceInstance.entire_context_api()
+        context = context_response.json().get("context", "")
         print("Entire context retrived for mcq generation")
     else:
-        context = qdrant_service_instance.query_context_retrieval(query)
+        context_response = qdrantApiServiceInstance.query_api(query)
+        context = context_response.json().get("context", "")
         print("Context retrieved based on user query")
 
     system_prompt = prompt.replace("{context}", context)
