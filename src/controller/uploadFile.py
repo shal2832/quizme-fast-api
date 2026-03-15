@@ -19,6 +19,10 @@ async def upload_file(file : UploadFile):
     Returns:
         JSONResponse: A response containing a success message, the file name, and the number of chunks created from the file.
     """
+    # Check existing collection and delete if exists
+    collections = qdrantApiServiceInstance.list_collections_api().json().get("collections", [])
+    delete_collection(collections[0]) if collections else None
+    print("Existing collections deleted, ready to process new file.")
     data = await file.read() 
     temp_file_path = chunk_file(data, file.filename)
     #delete the temp file after processing
