@@ -1,10 +1,7 @@
 {
   "version": 2,
   "functions": {
-    "main.py": {
-      "maxDuration": 60
-    },
-    "src/controller/*.py": {
+    "api/controller/*.py": {
       "maxDuration": 60
     }
   },
@@ -15,3 +12,4 @@
     }
   ]
 }
+
