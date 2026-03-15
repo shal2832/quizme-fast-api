@@ -11,5 +11,10 @@
       "src": "/(.*)",
       "dest": "main.py"
     }
-  ]
+  ],
+  "functions": {
+    "src/controller/*.py": {
+      "maxDuration": 60
+    }
+  }
 }

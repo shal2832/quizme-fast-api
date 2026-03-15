@@ -25,7 +25,7 @@ async def upload_file(file : UploadFile):
     collections = qdrantApiServiceInstance.list_collections_api().json().get("collections", [])
     delete_collection(collections[0]) if collections else None
     print("Existing collections deleted, ready to process new file.")
-    await sleep(4)
+    
     data = await file.read()
     temp_file_path = chunk_file(data, file.filename)
     #delete the temp file after processing

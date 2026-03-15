@@ -13,7 +13,7 @@ class qdrantApiService:
             return response
     
     def list_collections_api(self):
-        with httpx.Client() as client:
+        with httpx.Client(timeout=60.0) as client:
             response = client.get(
                 f"{os.getenv('QDRANT_SERVICE_URL')}/qdrant/collections"
             )
