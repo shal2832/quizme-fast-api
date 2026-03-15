@@ -1,20 +1,17 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "main.py",
-      "use": "@vercel/python"
+  "functions": {
+    "main.py": {
+      "maxDuration": 60
+    },
+    "src/controller/*.py": {
+      "maxDuration": 60
     }
-  ],
+  },
   "routes": [
     {
       "src": "/(.*)",
       "dest": "main.py"
     }
-  ],
-  "functions": {
-    "src/controller/*.py": {
-      "maxDuration": 60
-    }
-  }
+  ]
 }
