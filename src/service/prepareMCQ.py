@@ -75,7 +75,8 @@ class MCQGenerator:
         collections_response_json = qdrantApiServiceInstance.list_collections_api()
         collections_response = collections_response_json.json().get("collections", [])
         print(f"[MCQ Generation] Deleting collection:{collections_response}")
-        qdrantApiServiceInstance.delete_api(collections_response_json.json().get("collections", [])[0] if collections_response_json.json().get("collections", []) else "")
+        ### Do it later
+        # qdrantApiServiceInstance.delete_api(collections_response_json.json().get("collections", [])[0] if collections_response_json.json().get("collections", []) else "")
         
         print(f"[MCQ Generation] Formatting MCQ response...")
         formatted_response = self.format_mcq_response(res)
