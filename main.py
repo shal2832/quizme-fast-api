@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 
-## FOR DEPLOYMENT
 # Load environment variables from .env file
 load_dotenv()
 
